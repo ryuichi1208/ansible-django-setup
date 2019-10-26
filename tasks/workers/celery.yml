@@ -1,0 +1,23 @@
+---
+- name: Ensure the Supervisor service is running
+  service: name=supervisor state=started enabled=yes
+  tags: celery
+
+- name: Create the celery script file
+  template: src=templates/celery_start.j2
+            dest={{ application_bin_path }}/celery_start
+            owner={{ application_user }}
+            group={{ application_group }}
+            mode=0755
+  tags: celery
+
+- name: Create the Supervisor config file for {{ celery_application_name }}
+  template: src=supervisor_celery.conf.j2
+            dest=/etc/supervisor/conf.d/{{ celery_application_name }}.conf
+  tags: celery
+
+- name: Restart celery processes
+  supervisorctl: name={{ celery_application_name }} state=restarted
+  tags:
+    - celery
+    - deploy

@@ -1,0 +1,23 @@
+---
+- name: Run Django database migrations
+  become: yes
+  become_user: "{{ application_user }}"
+
+  django_manage:
+    command: migrate
+    app_path: "{{ django_manage_path }}"
+    virtualenv: "{{ python_venv_path }}"
+
+  environment: "{{ combined_environment_variables }}"
+  tags: deploy
+
+- name: Run Django collectstatic
+  become: yes
+  become_user: "{{ application_user }}"
+  django_manage:
+    command: collectstatic
+    app_path: "{{ django_manage_path }}"
+    virtualenv: "{{ python_venv_path }}"
+    #settings: "{{ django_settings_file }}"
+  environment: "{{ combined_environment_variables }}"
+  tags: deploy

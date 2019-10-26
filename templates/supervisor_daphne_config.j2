@@ -1,0 +1,5 @@
+[program:{{ application_name }}_daphne]
+command = {{ application_bin_path }}/daphne_start
+user = {{ application_user }}
+stdout_logfile = {{ application_log_path }}/daphne.log
+redirect_stderr = true

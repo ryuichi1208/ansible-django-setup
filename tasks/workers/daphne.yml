@@ -1,0 +1,57 @@
+---
+- name: Install supervisor packages
+  apt: name=supervisor update_cache=yes state=present
+  tags:
+    - daphne
+
+- name: Ensure the Supervisor service is running
+  service: name=supervisor state=started enabled=yes
+  tags:
+  - daphne
+
+- name: Create the Daphne script file
+  template: src=daphne_start.j2
+            dest={{ application_bin_path }}/daphne_start
+            owner={{ application_user }}
+            group={{ application_group }}
+            mode=0755
+            backup=yes
+  tags:
+    - daphne
+
+- name: Create the Supervisor config file
+  template: src=supervisor_daphne_config.j2
+            dest=/etc/supervisor/conf.d/{{ application_name }}_daphne.conf
+            backup=yes
+  tags:
+    - daphne
+
+- name: Restart daphne process
+  supervisorctl: name={{ application_name }}_daphne state=restarted
+  tags:
+    - deploy
+    - daphne
+
+- name: Create the Supervisor config file
+  template: src=supervisor_worker_config.j2
+            dest=/etc/supervisor/conf.d/{{ application_name }}_worker.conf
+            backup=yes
+  tags:
+    - daphne
+
+
+- name: Create the workers script file
+  template: src=worker_start.j2
+            dest={{ application_bin_path }}/worker_start
+            owner={{ application_user }}
+            group={{ application_group }}
+            mode=0755
+            backup=yes
+  tags:
+    - daphne
+
+- name: Restart channel workers processes
+  supervisorctl: name={{ application_name }}_worker state=restarted
+  tags:
+    - deploy
+    - daphne

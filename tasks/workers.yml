@@ -1,0 +1,18 @@
+---
+- include: workers/users_and_groups.yml
+- include: workers/source_code.yml
+- include: workers/geodjango.yml
+- include: workers/python.yml
+- include: workers/django_manage.yml
+- include: workers/web.yml
+  tags:
+    - nginx
+
+- include: workers/gunicorn.yml
+  when: not django_enable_channels
+- include: workers/daphne.yml
+  when: django_enable_channels
+  tags:
+    - channels
+- include: workers/celery.yml
+  when: django_enable_celery

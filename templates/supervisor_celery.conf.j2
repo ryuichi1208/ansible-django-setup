@@ -1,0 +1,10 @@
+[program:{{ celery_application_name }}]
+command={{ application_bin_path }}/celery_start
+
+autostart=true
+autorestart=true
+
+user={{ application_user }}
+
+stdout_logfile={{ application_log_path }}/celery.log
+redirect_stderr = true

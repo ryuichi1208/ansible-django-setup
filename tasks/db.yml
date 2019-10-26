@@ -1,0 +1,14 @@
+---
+- import_role:
+    name: Stouts.memcached
+- include: db/postgresql.yml
+- include: db/rabbitmq.yml
+  when: django_enable_celery
+- import_role: name=Stouts.redis
+  vars:
+    - redis_bind: "{{ channels_redis_bind }}"
+    - redis_port: "{{ channels_redis_port }}"
+    - redis_database_save_times: []
+  when: django_enable_channels
+  tags:
+    - redis

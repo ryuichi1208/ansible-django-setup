@@ -1,0 +1,5 @@
+[program:{{ application_name }}_worker]
+command = {{ application_bin_path }}/worker_start
+user = {{ application_user }}
+stdout_logfile = {{ application_log_path }}/worker.log
+redirect_stderr = true

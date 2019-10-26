@@ -1,0 +1,6 @@
+#!/bin/sh
+
+
+{% for variable_name, value in combined_environment_variables.items() %}
+export {{ variable_name }}="{{ value }}"
+{% endfor %}

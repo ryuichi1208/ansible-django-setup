@@ -1,0 +1,48 @@
+---
+- name: Provision python
+  import_role:
+    name: Stouts.python
+  vars:
+    python_ppa: ppa:deadsnakes/ppa
+    python_versions:
+      - "{{ python_version }}"
+
+- name: Install requirements
+  become: yes
+  become_user: "{{ application_user }}"
+  pip:
+    requirements: "{{ application_source_path }}/requirements.txt"
+    virtualenv: "{{ python_venv_path }}"
+    virtualenv_python: "python{{ python_version }}"
+  tags:
+    - deploy
+
+- name: Ensure gunicorn are installed in the virtualenv
+  become: yes
+  become_user: "{{ application_user }}"
+  pip: virtualenv={{ python_venv_path }} name={{ item }}
+  with_items:
+    - gunicorn
+
+- name: Create the virtualenv postactivate script to set environment variables
+  template: src=virtualenv_postactivate.j2
+            dest={{ python_venv_path }}/bin/postactivate
+            owner={{ application_user }}
+            group={{ application_group }}
+            mode=0640
+            backup=yes
+  tags:
+    - deploy
+
+- name: Ensure postactivate is used in virtualenv
+  lineinfile:
+    path: "{{ python_venv_path }}/bin/activate"
+    regexp: '^\. {{ python_venv_path }}/bin/postactivate'
+    line: '. {{ python_venv_path }}/bin/postactivate'
+
+
+#
+#- name: Install PostgreSQL
+#  apt: name={{ item }} update_cache=yes state=present
+#  with_items:
+#    - "python{{ python_version }}-psycopg2"

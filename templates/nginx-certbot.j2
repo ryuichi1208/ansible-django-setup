@@ -1,0 +1,14 @@
+server {
+    listen      80;
+    server_name {{ application_domain }};
+
+    access_log {{ application_log_path }}/nginx_access.log;
+    error_log {{ application_log_path }}/nginx_error.log;
+
+    location / {
+        root {{ application_www_path }}/;
+    }
+
+
+}
+

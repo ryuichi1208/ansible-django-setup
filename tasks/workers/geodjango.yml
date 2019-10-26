@@ -1,0 +1,10 @@
+---
+- name: Install geo libs
+  apt: name={{ item }} update_cache=yes state=present
+  with_items:
+    - binutils
+    - libproj-dev
+    - gdal-bin
+  when: geodjango_enabled
+  tags:
+    - geodjango

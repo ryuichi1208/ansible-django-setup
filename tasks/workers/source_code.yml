@@ -1,0 +1,27 @@
+---
+
+- apt: name=git state=present force=yes
+
+- name: Setup the Git repo
+  become: yes
+  become_user: "{{ application_user }}"
+  git: repo={{ git_repo }}
+       version={{ git_branch }}
+       dest={{ application_source_path }}
+       accept_hostkey=yes
+       force=yes
+  tags:
+    - deploy
+#  notify:
+#    - restart application
+#    - restart celery
+
+- name: Delete all .pyc files
+  become: yes
+  become_user: "{{ application_user }}"
+  command: find . -name '*.pyc' -delete
+  args:
+    chdir: "{{ application_source_path }}"
+  changed_when: False
+  tags:
+    - deploy

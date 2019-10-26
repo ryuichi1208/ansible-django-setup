@@ -1,0 +1,11 @@
+#!/bin/sh
+
+DJANGODIR={{ django_manage_path }}
+
+# Activate the virtual environment.
+cd $DJANGODIR
+. {{ python_venv_path }}/bin/activate
+
+# Programs meant to be run under supervisor should not daemonize themselves
+# (do not use --daemon).
+exec python manage.py runworker default

@@ -1,0 +1,21 @@
+---
+- name: Ensure rabbitmq is installed
+  tags: rabbitmq
+  import_role:
+    name: Stouts.rabbitmq
+  vars:
+    rabbitmq_enabled: yes
+    rabbitmq_plugins:                       # Ensure the plugins is installed
+      - rabbitmq_management
+    rabbitmq_vhosts:
+      - "{{ rabbitmq_vhost }}"
+    rabbitmq_users:                         # Ensure the users added
+      - user: "{{ rabbitmq_user }}"
+        password: "{{ rabbitmq_password }}"
+        vhost: "{{ rabbitmq_vhost }}"
+        configure_priv: .*
+        read_priv: .*
+        write_priv: .*
+
+    rabbitmq_users_remove:                  # Ensure the users removed
+      - guest

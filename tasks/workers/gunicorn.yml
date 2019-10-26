@@ -1,0 +1,24 @@
+---
+- name: Install supervisor packages
+  apt: name=supervisor update_cache=yes state=present
+
+- name: Ensure the Supervisor service is running
+  service: name=supervisor state=started enabled=yes
+
+- name: Create the Gunicorn script file
+  template: src=gunicorn_start.j2
+            dest={{ application_bin_path }}/gunicorn_start
+            owner={{ application_user }}
+            group={{ application_group }}
+            mode=0755
+            backup=yes
+
+
+- name: Create the Supervisor config file
+  template: src=supervisor_config.j2
+            dest=/etc/supervisor/conf.d/{{ application_name }}.conf
+            backup=yes
+
+- name: Re-read the Supervisor config files
+  supervisorctl: name={{ application_name }} state=restarted
+  tags: deploy
